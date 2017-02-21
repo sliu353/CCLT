@@ -10,6 +10,8 @@ namespace CCLT
     {
         public string Name { get; set; }
         public double MV { get; set; }
-        public double Amount { get; set; }
+        public double Amount { get; set;
+
+        }
     }
 }

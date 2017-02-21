@@ -46,6 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CalculatingPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CalculatingPage.Designer.cs">
+      <DependentUpon>CalculatingPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DFS.cs" />
     <Compile Include="Entry.cs" />
     <Compile Include="StartingPage.cs">
       <SubType>Form</SubType>
@@ -55,6 +62,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CalculatingPage.resx">
+      <DependentUpon>CalculatingPage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="StartingPage.resx">
       <DependentUpon>StartingPage.cs</DependentUpon>
     </EmbeddedResource>

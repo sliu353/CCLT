@@ -13,6 +13,9 @@ namespace CCLT
     public partial class StartingPage : Form
     {
         List<Entry> chemicals = new List<Entry>();
+        double lowerBound;
+        double upperBound;
+        double expectedMV;
 
         public StartingPage()
         {
@@ -82,7 +85,49 @@ namespace CCLT
 
         private void SubmitButton_Click(object sender, EventArgs e)
         {
+            if(upperBound == 0)
+            {
+                MessageBox.Show(
+                   "您未输入目标量的上限",
+                   "注意",
+                   MessageBoxButtons.OKCancel,
+                   MessageBoxIcon.Error);
+                return;
+            }
+            if (lowerBound == 0)
+            {
+                MessageBox.Show(
+                   "您未输入目标量的下限",
+                   "注意",
+                   MessageBoxButtons.OKCancel,
+                   MessageBoxIcon.Error);
+                return;
+            }
+            if (expectedMV == 0)
+            {
+                    MessageBox.Show(
+                       "您未输入需要的MV",
+                       "注意",
+                       MessageBoxButtons.OKCancel,
+                       MessageBoxIcon.Error);
+                    return;
 
+            }
+            if(chemicals.Any(c => c.Amount == 0 || c.MV == 0 || c.Name == "") || chemicals.Count < 2)
+            {
+                    MessageBox.Show(
+                       "您未完成所有原料信息的输入",
+                       "注意",
+                       MessageBoxButtons.OKCancel,
+                       MessageBoxIcon.Error);
+                    return;
+            }
+
+            CalculatingPage calculatingPage = new CalculatingPage();
+            calculatingPage.Left = Left;
+            calculatingPage.Top = Top;
+            Hide();
+            calculatingPage.Show();
         }
 
         private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)
@@ -102,6 +147,7 @@ namespace CCLT
                     MessageBoxIcon.Error);
                 e.Cancel = true;
             }
+            upperBound = value;
         }
 
         private void LowerBound_Validating(object sender, CancelEventArgs e)
@@ -116,6 +162,7 @@ namespace CCLT
                     MessageBoxIcon.Error);
                 e.Cancel = true;
             }
+            lowerBound = value;
         }
 
         private void ExpectedMV_Validating(object sender, CancelEventArgs e)
@@ -130,6 +177,7 @@ namespace CCLT
                     MessageBoxIcon.Error);
                 e.Cancel = true;
             }
+            expectedMV = value;
         }
     }
 }
