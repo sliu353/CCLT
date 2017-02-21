@@ -10,12 +10,14 @@ namespace CCLT
     {
         private Entry[] chemicals;
         private int targetUnits;
-        private double targetMV;
+        private double targetMVUpperBound;
+        private double targetMVLowerBound;
 
-        public DFS(List<Entry> chemicals, int targetUnits, double targetMV){
+        public DFS(List<Entry> chemicals, int targetUnits, double targetMVUpperBound, double targetMVLowerBound){
             this.chemicals = chemicals.OrderBy(x => x.MV).ToArray();
             this.targetUnits = targetUnits;
-            this.targetMV = targetMV;
+            this.targetMVLowerBound = targetMVLowerBound;
+            this.targetMVUpperBound = targetMVUpperBound;
         }
         
         public List<int[]> Calculate()
@@ -25,7 +27,7 @@ namespace CCLT
             int[] counters = new int[chemicals.Length];
 
             int chemicalIndex = 0;
-            while (chemicals[chemicalIndex].MV <= targetMV)
+            while (chemicals[chemicalIndex].MV < targetMVUpperBound)
             {
                 memoStack.Push(new stackItem(chemicalIndex, -1));
                 counters[chemicalIndex]++;
@@ -38,7 +40,17 @@ namespace CCLT
                         thisItem.VisitedChildNum++;
                         counters[thisItem.VisitedChildNum]++;
                     }
-                    result.Add(counters);
+
+                    // If this combination satisfy the requirement, add it to result.
+                    double totalMass = 0;
+                    for(int i = 0; i < counters.Length; i++)
+                    {
+                        totalMass += chemicals[i].MV * counters[i]; 
+                    }
+                    double averageMV = totalMass / targetUnits;
+                    if (averageMV > targetMVLowerBound && averageMV < targetMVUpperBound)
+                        result.Add(counters);
+
                     counters.CopyTo(counters, 0);
                     stackItem lastItem = memoStack.Pop();
                     counters[lastItem.ItemNum]--;
