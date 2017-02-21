@@ -58,14 +58,16 @@ namespace CCLT
                     {
                         stackItem popedItem = memoStack.Pop();
                         counters[popedItem.ItemNum]--;
+                        if (memoStack.Count == 0) break;
                     }
                 }
+                chemicalIndex++;
             }
             return result;
         }
     }
 
-    struct stackItem
+    class stackItem
     {
         public int ItemNum { get; set; }
         public int VisitedChildNum { get; set; }

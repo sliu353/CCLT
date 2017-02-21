@@ -15,7 +15,7 @@ namespace CCLT
         List<Entry> chemicals = new List<Entry>();
         double lowerBound;
         double upperBound;
-        double expectedMV;
+        int targetAmount;
 
         public StartingPage()
         {
@@ -103,7 +103,7 @@ namespace CCLT
                    MessageBoxIcon.Error);
                 return;
             }
-            if (expectedMV == 0)
+            if (targetAmount == 0)
             {
                     MessageBox.Show(
                        "您未输入需要的MV",
@@ -127,6 +127,8 @@ namespace CCLT
             calculatingPage.Left = Left;
             calculatingPage.Top = Top;
             Hide();
+            DFS dfsAlgorithm = new DFS(chemicals, targetAmount, upperBound, lowerBound);
+            dfsAlgorithm.Calculate();
             calculatingPage.Show();
         }
 
@@ -167,8 +169,8 @@ namespace CCLT
 
         private void ExpectedMV_Validating(object sender, CancelEventArgs e)
         {
-            double value;
-            if (!double.TryParse((string)ExpectedMV.Text, out value))
+            int value;
+            if (!int.TryParse((string)ExpectedMV.Text, out value))
             {
                 MessageBox.Show(
                     "请输入数字",
@@ -177,7 +179,7 @@ namespace CCLT
                     MessageBoxIcon.Error);
                 e.Cancel = true;
             }
-            expectedMV = value;
+            targetAmount = value;
         }
     }
 }
