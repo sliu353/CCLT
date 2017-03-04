@@ -8,74 +8,98 @@ namespace CCLT
 {
     class DFS
     {
-        private Entry[] chemicals;
+        private List<Entry> condensedChemicals = new List<Entry>();
+        private List<Entry> lightChemicals = new List<Entry>();
+        private List<Entry> standardChemicals = new List<Entry>();
         private int targetUnits;
         private double targetMVUpperBound;
         private double targetMVLowerBound;
 
-        public DFS(List<Entry> chemicals, int targetUnits, double targetMVUpperBound, double targetMVLowerBound){
-            this.chemicals = chemicals.OrderBy(x => x.MV).ToArray();
-            this.targetUnits = targetUnits;
-            this.targetMVLowerBound = targetMVLowerBound;
+        public DFS(List<Entry> chemicals, int targetUnits, double targetMVUpperBound, double targetMVLowerBound)
+        {
+            chemicals.ForEach(c =>
+            {
+                if (c.MV > targetMVUpperBound) condensedChemicals.Add(c);
+                else if (c.MV < targetMVLowerBound) lightChemicals.Add(c);
+                else standardChemicals.Add(c);
+            });
+
+            condensedChemicals = condensedChemicals.OrderBy(c => c.MV).ToList();
+            lightChemicals = lightChemicals.OrderByDescending(c => c.MV).ToList();
+            this.targetUnits = targetUnits; this.targetMVLowerBound = targetMVLowerBound;
             this.targetMVUpperBound = targetMVUpperBound;
         }
-        
-        public List<int[]> Calculate()
+
+        public void Calculate()
         {
-            List<int[]> result = new List<int[]>();
-            Stack<stackItem> memoStack = new Stack<stackItem>();
-            int[] counters = new int[chemicals.Length];
+            int addUnits = 0;
+            double totalAmount = 0;
 
-            int chemicalIndex = 0;
-            while (chemicals[chemicalIndex].MV < targetMVUpperBound)
+            // Select all units of chemicals with MV between upper bound and lower bound.
+            standardChemicals.ForEach(c =>
             {
-                memoStack.Push(new stackItem(chemicalIndex, -1));
-                counters[chemicalIndex]++;
-                while (memoStack.Count > 0)
+                if (c.Units < targetUnits)
                 {
-                    while(memoStack.Count != targetUnits)
-                    {
-                        stackItem thisItem = memoStack.Peek();
-                        memoStack.Push(new stackItem(thisItem.VisitedChildNum + 1, -1));
-                        thisItem.VisitedChildNum++;
-                        counters[thisItem.VisitedChildNum]++;
-                    }
+                    c.SelectedUnits = c.Units;
+                    targetUnits -= c.Units;
+                    addUnits += c.Units;
+                    totalAmount += c.Units * c.MV;
+                }
+                else
+                {
+                    c.SelectedUnits = targetUnits;
+                    targetUnits = 0;
+                    addUnits += targetUnits;
+                    totalAmount += c.Units * c.MV;
+                }
+            });
 
-                    // If this combination satisfy the requirement, add it to result.
-                    double totalMass = 0;
-                    for(int i = 0; i < counters.Length; i++)
-                    {
-                        totalMass += chemicals[i].MV * counters[i]; 
-                    }
-                    double averageMV = totalMass / targetUnits;
-                    if (averageMV > targetMVLowerBound && averageMV < targetMVUpperBound)
-                        result.Add(counters);
+            int condensedIndex = 0;
+            int lightIndex = 0;
 
-                    counters.CopyTo(counters, 0);
-                    stackItem lastItem = memoStack.Pop();
-                    counters[lastItem.ItemNum]--;
-                    while (memoStack.Peek().VisitedChildNum == counters.Length - 1)
+            for (int i = 0; i < targetUnits; i++)
+            {
+                double averageMV = totalAmount / addUnits;
+                if (averageMV < targetMVLowerBound && condensedIndex < condensedChemicals.Count)
+                {
+                    totalAmount += condensedChemicals[condensedIndex].MV;
+                    condensedChemicals[condensedIndex].SelectedUnits++;
+                    if (condensedChemicals[condensedIndex].SelectedUnits == condensedChemicals[condensedIndex].Units)
                     {
-                        stackItem popedItem = memoStack.Pop();
-                        counters[popedItem.ItemNum]--;
-                        if (memoStack.Count == 0) break;
+                        condensedIndex++;
                     }
                 }
-                chemicalIndex++;
+                else if (averageMV > targetMVUpperBound && lightIndex < lightChemicals.Count)
+                {
+                    totalAmount += lightChemicals[lightIndex].MV;
+                    lightChemicals[lightIndex].SelectedUnits++;
+                    if (lightChemicals[lightIndex].SelectedUnits == lightChemicals[lightIndex].Units)
+                    {
+                        lightIndex++;
+                    }
+                }
+                else
+                {
+                    if (lightIndex < lightChemicals.Count)
+                    {
+                        totalAmount += lightChemicals[lightIndex].MV;
+                        lightChemicals[lightIndex].SelectedUnits++;
+                        if (lightChemicals[lightIndex].SelectedUnits == lightChemicals[lightIndex].Units)
+                        {
+                            lightIndex++;
+                        }
+                    }
+                    else
+                    {
+                        totalAmount += condensedChemicals[condensedIndex].MV;
+                        condensedChemicals[condensedIndex].SelectedUnits++;
+                        if (condensedChemicals[condensedIndex].SelectedUnits == condensedChemicals[condensedIndex].Units)
+                        {
+                            condensedIndex++;
+                        }
+                    }
+                }
             }
-            return result;
-        }
-    }
-
-    class stackItem
-    {
-        public int ItemNum { get; set; }
-        public int VisitedChildNum { get; set; }
-
-        public stackItem(int itemNum, int visitedChildNum)
-        {
-            this.ItemNum = itemNum;
-            this.VisitedChildNum = visitedChildNum;
         }
     }
 }

@@ -33,6 +33,7 @@ namespace CCLT
             Entries.Columns[0].HeaderText = "配料名";
             Entries.Columns[1].HeaderText = "MV";
             Entries.Columns[2].HeaderText = "数量";
+            Entries.Columns[3].Visible = false;
         }
 
         private void Entries_SelectionChanged(object sender, EventArgs e)
@@ -113,7 +114,7 @@ namespace CCLT
                     return;
 
             }
-            if(chemicals.Any(c => c.Amount == 0 || c.MV == 0 || c.Name == "") || chemicals.Count < 2)
+            if(chemicals.Any(c => c.Units == 0 || c.MV == 0 || c.Name == "") || chemicals.Count < 2)
             {
                     MessageBox.Show(
                        "您未完成所有原料信息的输入",
@@ -123,12 +124,12 @@ namespace CCLT
                     return;
             }
 
-            CalculatingPage calculatingPage = new CalculatingPage();
+            DFS dfsAlgorithm = new DFS(chemicals, targetAmount, upperBound, lowerBound);
+            dfsAlgorithm.Calculate();
+            CalculatingPage calculatingPage = new CalculatingPage(chemicals, targetAmount, upperBound, lowerBound);
             calculatingPage.Left = Left;
             calculatingPage.Top = Top;
             Hide();
-            DFS dfsAlgorithm = new DFS(chemicals, targetAmount, upperBound, lowerBound);
-            dfsAlgorithm.Calculate();
             calculatingPage.Show();
         }
 

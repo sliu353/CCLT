@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace CCLT
 {
-    class Entry
+    public class Entry
     {
         public string Name { get; set; }
         public double MV { get; set; }
-        public double Amount { get; set;
-
-        }
+        public int Units { get; set;}
+        public int SelectedUnits { get; set; }
     }
 }
