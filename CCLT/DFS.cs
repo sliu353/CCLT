@@ -57,9 +57,21 @@ namespace CCLT
             int condensedIndex = 0;
             int lightIndex = 0;
 
+            int specialIndex = 0;
+
             for (int i = 0; i < targetUnits; i++)
             {
-                double averageMV = totalAmount / addUnits;
+                if(i + addUnits == 0)
+                {
+                    totalAmount += condensedChemicals[condensedIndex].MV;
+                    condensedChemicals[condensedIndex].SelectedUnits++;
+                    if (condensedChemicals[condensedIndex].SelectedUnits == condensedChemicals[condensedIndex].Units)
+                    {
+                        condensedIndex++;
+                    }
+                    continue;
+                }
+                double averageMV = totalAmount / (i + addUnits);
                 if (averageMV < targetMVLowerBound && condensedIndex < condensedChemicals.Count)
                 {
                     totalAmount += condensedChemicals[condensedIndex].MV;
@@ -80,24 +92,49 @@ namespace CCLT
                 }
                 else
                 {
-                    if (lightIndex < lightChemicals.Count)
+                    if (specialIndex % 2 == 0)
                     {
-                        totalAmount += lightChemicals[lightIndex].MV;
-                        lightChemicals[lightIndex].SelectedUnits++;
-                        if (lightChemicals[lightIndex].SelectedUnits == lightChemicals[lightIndex].Units)
+                        if (lightIndex < lightChemicals.Count)
                         {
-                            lightIndex++;
+                            totalAmount += lightChemicals[lightIndex].MV;
+                            lightChemicals[lightIndex].SelectedUnits++;
+                            if (lightChemicals[lightIndex].SelectedUnits == lightChemicals[lightIndex].Units)
+                            {
+                                lightIndex++;
+                            }
+                        }
+                        else
+                        {
+                            totalAmount += condensedChemicals[condensedIndex].MV;
+                            condensedChemicals[condensedIndex].SelectedUnits++;
+                            if (condensedChemicals[condensedIndex].SelectedUnits == condensedChemicals[condensedIndex].Units)
+                            {
+                                condensedIndex++;
+                            }
                         }
                     }
                     else
                     {
-                        totalAmount += condensedChemicals[condensedIndex].MV;
-                        condensedChemicals[condensedIndex].SelectedUnits++;
-                        if (condensedChemicals[condensedIndex].SelectedUnits == condensedChemicals[condensedIndex].Units)
+                        if (condensedIndex < condensedChemicals.Count)
                         {
-                            condensedIndex++;
+                            totalAmount += condensedChemicals[condensedIndex].MV;
+                            condensedChemicals[condensedIndex].SelectedUnits++;
+                            if (condensedChemicals[condensedIndex].SelectedUnits == condensedChemicals[condensedIndex].Units)
+                            {
+                                condensedIndex++;
+                            }
+                        }
+                        else
+                        {
+                            totalAmount += lightChemicals[lightIndex].MV;
+                            lightChemicals[lightIndex].SelectedUnits++;
+                            if (lightChemicals[lightIndex].SelectedUnits == lightChemicals[lightIndex].Units)
+                            {
+                                lightIndex++;
+                            }
                         }
                     }
+                    specialIndex++;
                 }
             }
         }
