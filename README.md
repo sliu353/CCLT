@@ -7,3 +7,5 @@ This application is designed for solving a real-life problem in chemical industr
 Supposing we have n different materials available (M1, M2, ..., Mi, ..., Mn), the units and density of which are Ui and Di where i represent the index of the material, now we want to take a certain units of each materials (ui) and mix them into m units of mixture of density between u (the lowest acceptable density) and η (the highest acceptable density), which can be represented as formula: 
 
 <div style="text-align:center"><img src ="/Formula.PNG" /></div>
+
+As the fomulas suggest, there can always be multiple roots
